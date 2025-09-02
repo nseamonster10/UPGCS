@@ -1,24 +1,44 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-type Player = { id: string; name: string; index: number };
+type Team = 'A' | 'B';
+type Player = { id: string; name: string; index: number; team: Team };
+
 const STORAGE_KEY = 'upgcs.players';
+
+// safe id generator (works everywhere)
+const makeId = () =>
+  typeof globalThis !== 'undefined' &&
+  (globalThis as any).crypto &&
+  typeof (globalThis as any).crypto.randomUUID === 'function'
+    ? (globalThis as any).crypto.randomUUID()
+    : Math.random().toString(36).slice(2);
 
 export default function PlayersPage() {
   const [name, setName] = useState('');
   const [index, setIndex] = useState<string>('');
+  const [team, setTeam] = useState<Team>('A');
   const [players, setPlayers] = useState<Player[]>([]);
 
-  // Load saved players from the browser
+  // load saved players (browser only)
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setPlayers(JSON.parse(raw));
+      if (raw) {
+        const parsed = JSON.parse(raw) as any[];
+        const fixed: Player[] = parsed.map((p) => ({
+          id: p.id ?? makeId(),
+          name: p.name ?? '',
+          index: Number(p.index ?? 0),
+          team: p.team === 'B' ? 'B' : 'A',
+        }));
+        setPlayers(fixed);
+      }
     } catch {}
   }, []);
 
-  // Save whenever the list changes
+  // save whenever players change
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
@@ -30,10 +50,11 @@ export default function PlayersPage() {
     if (!name || index.trim() === '' || isNaN(Number(index))) return;
     setPlayers((prev) => [
       ...prev,
-      { id: Math.random().toString(36).slice(2), name: name.trim(), index: Number(index) },
+      { id: makeId(), name: name.trim(), index: Number(index), team },
     ]);
     setName('');
     setIndex('');
+    setTeam('A');
   }
 
   function remove(id: string) {
@@ -43,6 +64,9 @@ export default function PlayersPage() {
   function clearAll() {
     setPlayers([]);
   }
+
+  const teamA = useMemo(() => players.filter((p) => p.team === 'A'), [players]);
+  const teamB = useMemo(() => players.filter((p) => p.team === 'B'), [players]);
 
   return (
     <main className="min-h-screen p-8 space-y-6">
@@ -58,24 +82,50 @@ export default function PlayersPage() {
         <input
           type="number"
           step="0.1"
-          className="border px-3 py-2 rounded w-32"
+          className="border px-3 py-2 rounded w-40"
           placeholder="Handicap Index"
           value={index}
           onChange={(e) => setIndex(e.target.value)}
         />
+        <select
+          className="border px-3 py-2 rounded"
+          value={team}
+          onChange={(e) => setTeam(e.target.value as Team)}
+        >
+          <option value="A">Team A</option>
+          <option value="B">Team B</option>
+        </select>
+
         <button className="border px-3 py-2 rounded" type="submit">Add</button>
         <button className="border px-3 py-2 rounded" type="button" onClick={clearAll}>Clear All</button>
       </form>
 
-      <ul className="space-y-2">
-        {players.map((p) => (
-          <li key={p.id} className="flex gap-3 items-center">
-            <span className="font-medium w-48">{p.name}</span>
-            <span>HI: {p.index.toFixed(1)}</span>
-            <button className="underline" onClick={() => remove(p.id)}>remove</button>
-          </li>
-        ))}
-      </ul>
+      <section className="grid md:grid-cols-2 gap-8">
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Team A ({teamA.length})</h2>
+          <ul className="space-y-2">
+            {teamA.map((p) => (
+              <li key={p.id} className="flex items-center gap-3">
+                <span className="font-medium w-48">{p.name}</span>
+                <span>HI: {p.index.toFixed(1)}</span>
+                <button className="underline" onClick={() => remove(p.id)}>remove</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold mb-2">Team B ({teamB.length})</h2>
+          <ul className="space-y-2">
+            {teamB.map((p) => (
+              <li key={p.id} className="flex items-center gap-3">
+                <span className="font-medium w-48">{p.name}</span>
+                <span>HI: {p.index.toFixed(1)}</span>
+                <button className="underline" onClick={() => remove(p.id)}>remove</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
     </main>
   );
 }
