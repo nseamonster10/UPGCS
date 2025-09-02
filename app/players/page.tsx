@@ -145,18 +145,6 @@ function TeamList({
               <option value="A">A</option>
               <option value="B">B</option>
             </select>
-            <button className="underline" onClick={() => onSetTeam(p.id, 'NA')}>
-              set N/A
-            </button>
-            <button className="underline" onClick={() => onSetTeam(p.id, 'A')}>
-              set A
-            </button>
-            <button className="underline" onClick={() => onSetTeam(p.id, 'B')}>
-              set B
-            </button>
-            <button className="underline" onClick={() => removePlayer(p.id, onSetTeam)}>
-              remove
-            </button>
           </li>
         ))}
       </ul>
@@ -164,8 +152,7 @@ function TeamList({
   );
 }
 
+
 // helper for "remove" inside TeamList
-function removePlayer(id: string, onSetTeam: (id: string, t: Team) => void) {
-  // no-op here; actual removal handled in parent via a different button, but we left this
-  // to keep the sample simple. You can remove this and rely on the remove button in parent if preferred.
-}
+function removePlayer(/* ... */) { /* delete this whole function */ }
+
