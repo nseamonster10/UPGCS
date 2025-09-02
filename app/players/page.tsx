@@ -7,7 +7,7 @@ type Player = { id: string; name: string; index: number; team: Team };
 
 const STORAGE_KEY = 'upgcs.players';
 
-// Safe id generator
+// Safe ID generator
 const makeId = () =>
   typeof globalThis !== 'undefined' &&
   (globalThis as any).crypto &&
@@ -38,7 +38,7 @@ export default function PlayersPage() {
     } catch {}
   }, []);
 
-  // Persist
+  // Persist whenever players change
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(players));
@@ -55,10 +55,6 @@ export default function PlayersPage() {
     setName('');
     setIndex('');
     setTeam('NA');
-  }
-
-  function remove(id: string) {
-    setPlayers((prev) => prev.filter((p) => p.id !== id));
   }
 
   function clearAll() {
@@ -151,8 +147,3 @@ function TeamList({
     </div>
   );
 }
-
-
-// helper for "remove" inside TeamList
-function removePlayer(/* ... */) { /* delete this whole function */ }
-
