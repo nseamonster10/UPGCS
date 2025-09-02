@@ -6,11 +6,11 @@ export default function Home() {
       <h1 className="text-3xl font-bold">UPGCS — I-29 Cup</h1>
       <p>Hello from our fresh app. Deployed from GitHub → Vercel.</p>
 
-      <div className="space-x-4">
-        <Link href="/players" className="underline">Manage Players →</Link>
-        <Link href="/rules" className="underline">Rules / Formats →</Link>
-      </div>
+      <ul className="list-disc pl-6 space-y-2">
+        <li><Link href="/players" className="underline">Manage Players →</Link></li>
+        <li><Link href="/rules" className="underline">Rules / Formats →</Link></li>
+        <li><Link href="/pairings/sat-am" className="underline">Pairings — Saturday AM →</Link></li>
+      </ul>
     </main>
   );
 }
-<Link href="/pairings/sat-am" className="underline">Saturday AM Pairings →</Link>
