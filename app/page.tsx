@@ -13,3 +13,4 @@ export default function Home() {
     </main>
   );
 }
+<Link href="/pairings/sat-am" className="underline">Saturday AM Pairings →</Link>
