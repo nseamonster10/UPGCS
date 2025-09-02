@@ -6,9 +6,10 @@ export default function Home() {
       <h1 className="text-3xl font-bold">UPGCS — I-29 Cup</h1>
       <p>Hello from our fresh app. Deployed from GitHub → Vercel.</p>
 
-      <Link href="/players" className="underline">
-        Manage Players →
-      </Link>
+      <div className="space-x-4">
+        <Link href="/players" className="underline">Manage Players →</Link>
+        <Link href="/rules" className="underline">Rules / Formats →</Link>
+      </div>
     </main>
   );
 }
