@@ -203,3 +203,4 @@ export default function RosterPage() {
     </main>
   );
 }
+<li><Link href="/roster" className="underline">Build Roster →</Link></li>
