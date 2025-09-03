@@ -7,6 +7,7 @@ export default function Home() {
 
       <ul className="list-disc pl-6 space-y-2">
         <li><Link href="/players" className="underline">Manage Players →</Link></li>
+        <li><Link href="/roster" className="underline">Build Roster →</Link></li>
         <li><Link href="/rules" className="underline">Rules / Formats →</Link></li>
         <li><Link href="/pairings/sat-am" className="underline">Pairings — Saturday AM →</Link></li>
         <li><Link href="/pairings/sat-pm" className="underline">Pairings — Saturday PM →</Link></li>
