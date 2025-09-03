@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Player, Team, Roster } from '@/lib/types';
-import { KEYS, getJSON, setJSON } from '@/lib/storage';
+import { Player, Team, Roster } from '../../lib/types';
+import { KEYS, getJSON, setJSON } from '../../lib/storage';
 
 type SortKey = 'name-asc' | 'hi-asc' | 'hi-desc';
 
@@ -15,7 +15,7 @@ export default function RosterPage() {
 
   // Load players + any saved roster
   useEffect(() => {
-    const ps = getJSON<Player[]>(KEYS.PLAYERS, []);
+    const ps = getJSON<Player[]>(KEYS.PLAYERS, []);   // <-- pulls from Manage Players
     setPlayers(ps);
 
     const saved = getJSON<Roster | null>(KEYS.ROSTER, null);
@@ -25,24 +25,17 @@ export default function RosterPage() {
     }
   }, []);
 
-  // persist player team changes (so Manage Players & Roster stay in sync)
+  // Keep PLAYERS in sync if you change teams here
   useEffect(() => {
-    // write-through whenever teams change
     setJSON(KEYS.PLAYERS, players);
   }, [players]);
 
   const sortedPlayers = useMemo(() => {
     const copy = [...players];
     switch (sortKey) {
-      case 'name-asc':
-        copy.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'hi-asc':
-        copy.sort((a, b) => a.index - b.index);
-        break;
-      case 'hi-desc':
-        copy.sort((a, b) => b.index - a.index);
-        break;
+      case 'name-asc': copy.sort((a, b) => a.name.localeCompare(b.name)); break;
+      case 'hi-asc':  copy.sort((a, b) => a.index - b.index); break;
+      case 'hi-desc': copy.sort((a, b) => b.index - a.index); break;
     }
     return copy;
   }, [players, sortKey]);
@@ -62,37 +55,30 @@ export default function RosterPage() {
     setPlayers(prev => prev.map(p => (p.id === id ? { ...p, team } : p)));
   }
 
-  function includeAll() {
-    setIncluded(new Set(players.map(p => p.id)));
-  }
-  function includeNone() {
-    setIncluded(new Set());
-  }
+  function includeAll()   { setIncluded(new Set(players.map(p => p.id))); }
+  function includeNone()  { setIncluded(new Set()); }
 
-  // Randomize teams (balanced by HI) on currently "included" players
   function randomizeTeamsBalanced() {
     const pool = players.filter(p => included.has(p.id));
     if (pool.length < 2) {
       alert('Select at least 2 included players to balance.');
       return;
     }
-    // sort low HI (better) to high HI (worse)
     const sorted = [...pool].sort((a, b) => a.index - b.index);
-    // snake draft into two teams
     const A: Player[] = [];
     const B: Player[] = [];
     sorted.forEach((p, i) => (i % 2 === 0 ? A.push(p) : B.push(p)));
 
-    // write back team assignments for included players; leave others as-is
     setPlayers(prev =>
       prev.map(p =>
         included.has(p.id)
-          ? { ...p, team: A.some(x => x.id === p.id) ? 'A' : B.some(x => x.id === p.id) ? 'B' : 'NA' }
+          ? { ...p, team: A.some(x => x.id === p.id) ? 'A' : 'B' }
           : p
       )
     );
   }
 
+  // NEW: Save Roster — creates the "active event roster"
   function saveRoster() {
     const payload: Roster = {
       name: rosterName || 'I-29 Cup',
@@ -100,7 +86,7 @@ export default function RosterPage() {
       createdAt: new Date().toISOString(),
     };
     setJSON(KEYS.ROSTER, payload);
-    alert('Roster saved. Pairings/Rounds can use this as the active roster.');
+    alert('Roster saved as your active event. Next step: Add rounds (coming next).');
   }
 
   return (
@@ -198,7 +184,7 @@ export default function RosterPage() {
       </section>
 
       <p className="text-sm text-gray-600">
-        Tip: Use Manage Players to add/edit golfers. Roster saves who’s in the event and their teams.
+        Tip: Save here to create your active event roster. Rounds & pairings will use this (next step).
       </p>
     </main>
   );
