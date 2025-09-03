@@ -11,6 +11,7 @@ export default function Home() {
         <li><Link href="/pairings/sat-am" className="underline">Pairings — Saturday AM →</Link></li>
         <li><Link href="/pairings/sat-pm" className="underline">Pairings — Saturday PM →</Link></li>
         <li><Link href="/pairings/sun" className="underline">Pairings — Sunday Singles →</Link></li>
+        <li><Link href="/pairings/sunday" className="underline">Pairings — Sunday Singles →</Link></li> 
       </ul>
     </main>
   );
